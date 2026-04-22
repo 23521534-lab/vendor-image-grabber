@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendors — Vendor Image Grabber</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .vendors-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 48px;
+    }
+
+    .vendor-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+
+    .vendor-card:hover {
+      border-color: rgba(124,106,247,0.35);
+      transform: translateY(-4px);
+    }
+
+    .vendor-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .vendor-card:hover::before { opacity: 1; }
+
+    .vc-top { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+
+    .vc-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .vc-name { font-size: 20px; font-weight: 800; margin-bottom: 3px; }
+    .vc-url {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; color: var(--accent);
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .vc-url:hover { opacity: 0.7; }
+
+    .vc-status {
+      margin-left: auto;
+      padding: 4px 10px;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 6px;
+      font-size: 9px; font-weight: 800;
+      color: var(--green);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.08em;
+      align-self: flex-start;
+    }
+
+    .vc-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 18px; }
+
+    .vc-methods {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .vc-method {
+      padding: 4px 10px;
+      background: rgba(124,106,247,0.08);
+      border: 1px solid rgba(124,106,247,0.18);
+      border-radius: 6px;
+      font-size: 11px; font-weight: 600;
+      color: var(--accent-2);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .vc-notes {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 12px; color: var(--muted); line-height: 1.65;
+    }
+
+    .vc-notes strong { color: var(--text); }
+
+    /* Request vendor CTA */
+    .request-card {
+      background: var(--surface);
+      border: 1px dashed rgba(124,106,247,0.3);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .request-icon { font-size: 40px; opacity: 0.5; }
+
+    .request-text h3 { font-size: 18px; font-weight: 800; margin-bottom: 7px; }
+    .request-text p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    .request-btns { margin-left: auto; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<script>window.ACTIVE_PAGE="vendors.html";</script>
+
+<div class="page">
+  <div class="page-hero">
+    <p class="page-tag">// supported sites</p>
+    <h1 class="page-title">VENDORS</h1>
+    <p class="page-desc">Each vendor has a custom-written scraper tuned to its specific HTML structure and image hosting setup.</p>
+  </div>
+
+  <div class="content">
+
+    <div class="vendors-grid">
+
+      <!-- Bassett Mirror -->
+      <div class="vendor-card" style="--vc: #7c6af7">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7c6af7,transparent)"></div>
+        <div class="vc-top">
+          <div class="vc-icon-wrap" style="background:rgba(124,106,247,0.12);border:1px solid rgba(124,106,247,0.2)">🪞</div>
+          <div>
+            <div class="vc-name">Bassett Mirror</div>
+            <a class="vc-url" href="https://www.bassettmirror.com" target="_blank">bassettmirror.com ↗</a>
+          </div>
+          <span class="vc-status">ACTIVE</span>
+        </div>
+
+        <p class="vc-desc">Furniture and mirror catalog. Product images are served through multiple mechanisms — standard img tags, zoom gallery data attributes, and CSS background images on swatch elements.</p>
+
+        <div class="vc-methods">
+          <span class="vc-method">img[src]</span>
+          <span class="vc-method">data-zoom-image</span>
+          <span class="vc-method">data-large / data-full</span>
+          <span class="vc-method">background-image CSS</span>
+          <span class="vc-method">a[href] image links</span>
+          <span class="vc-method">CDN HTML scan</span>
+        </div>
+
+        <div class="vc-notes">
+          <strong>Best pages to scan:</strong> Individual product pages and category listing pages. Zoom images give the highest resolution. The scraper automatically filters icons, logos, and UI sprites.
+        </div>
+      </div>
+
+      <!-- Worldwide Home -->
+      <div class="vendor-card">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#4ade80,transparent)"></div>
+        <div class="vc-top">
+          <div class="vc-icon-wrap" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2)">🏠</div>
+          <div>
+            <div class="vc-name">Worldwide Home</div>
+            <a class="vc-url" href="https://worldwidehomefurnishingsinc.com" target="_blank">worldwidehomefurnishingsinc.com ↗</a>
+          </div>
+          <span class="vc-status">ACTIVE</span>
+        </div>
+
+        <p class="vc-desc">Wholesale home furnishings vendor. Images are served from a separate portal CDN subdomain. Product pages also contain a <strong>DOWNLOADS</strong> section with direct full-resolution image URLs listed as plain text.</p>
+
+        <div class="vc-methods">
+          <span class="vc-method">portal CDN regex</span>
+          <span class="vc-method">DOWNLOADS section parser</span>
+          <span class="vc-method">img[src]</span>
+          <span class="vc-method">a[href] image links</span>
+        </div>
+
+        <div class="vc-notes">
+          <strong>Best pages to scan:</strong> Individual product pages — the DOWNLOADS section contains the highest-resolution images. The portal CDN pattern catches all images embedded in the page HTML.
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="divider">
+
+    <!-- Add vendor CTA -->
+    <div class="request-card">
+      <div class="request-icon">🔌</div>
+      <div class="request-text">
+        <h3>Need another vendor?</h3>
+        <p>Adding a new vendor takes about 10 minutes. Drop a config block into <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent-2)">vendors.js</code> — no core code changes required. The guide walks you through it step by step.</p>
+      </div>
+      <div class="request-btns">
+        <a href="add-vendor.html" class="btn btn-primary">Add a Vendor →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="nav.js"></script>
+</body>
+</html>

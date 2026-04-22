@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add a Vendor — Vendor Image Grabber</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* Guide steps */
+    .guide-step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 24px;
+      margin-bottom: 48px;
+      align-items: start;
+    }
+
+    .gs-num {
+      width: 52px; height: 52px;
+      background: rgba(124,106,247,0.1);
+      border: 1px solid rgba(124,106,247,0.25);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .gs-body h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .gs-body p { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 14px; }
+
+    .tip-box {
+      padding: 14px 16px;
+      background: rgba(124,106,247,0.07);
+      border: 1px solid rgba(124,106,247,0.2);
+      border-radius: 9px;
+      font-size: 13px; color: var(--text); line-height: 1.65;
+      margin-top: 14px;
+    }
+    .tip-box strong { color: var(--accent-2); }
+
+    .warn-box {
+      padding: 14px 16px;
+      background: rgba(251,191,36,0.07);
+      border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 9px;
+      font-size: 13px; color: var(--text); line-height: 1.65;
+      margin-top: 14px;
+    }
+
+    /* DevTools tips grid */
+    .devtools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .dt-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .dt-card .dt-icon { font-size: 22px; margin-bottom: 10px; }
+    .dt-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+    .dt-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* Pattern library */
+    .pattern-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 13px;
+    }
+
+    .pattern-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .pattern-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .pattern-table td:first-child {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-2);
+      white-space: nowrap;
+    }
+
+    .pattern-table td:last-child { color: var(--muted); }
+
+    .pattern-table tr:last-child td { border-bottom: none; }
+  </style>
+</head>
+<body>
+<script>window.ACTIVE_PAGE="add-vendor.html";</script>
+
+<div class="page">
+  <div class="page-hero">
+    <p class="page-tag">// extensibility</p>
+    <h1 class="page-title">ADD A<br><em>Vendor</em></h1>
+    <p class="page-desc">Adding support for a new vendor takes about 10 minutes. All you need to edit is one file — <code style="font-family:'DM Mono',monospace;color:var(--accent-2)">vendors.js</code>.</p>
+  </div>
+
+  <div class="content content-narrow">
+
+    <!-- OVERVIEW -->
+    <div class="tip-box" style="margin-bottom:48px;">
+      <strong>The core rule:</strong> The extension UI, download logic, and settings are all in <code style="font-family:'DM Mono',monospace;font-size:12px">popup.js</code>. It never needs to change when you add a vendor. All vendor-specific logic lives in <code style="font-family:'DM Mono',monospace;font-size:12px">vendors.js</code> — just add a new object and write a scraper function.
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="guide-step">
+      <div class="gs-num">1</div>
+      <div class="gs-body">
+        <h3>Open vendors.js</h3>
+        <p>In the extension folder, open <code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">vendors.js</code>. You'll see the <code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">VENDORS</code> object at the top, with one entry per supported site.</p>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="guide-step">
+      <div class="gs-num">2</div>
+      <div class="gs-body">
+        <h3>Research the vendor site in DevTools</h3>
+        <p>Before writing the scraper, spend 5 minutes on the vendor site's product page with Chrome DevTools open. You need to find where images come from.</p>
+
+        <div class="devtools-grid">
+          <div class="dt-card">
+            <div class="dt-icon">🔍</div>
+            <h4>Elements panel</h4>
+            <p>Inspect a product image. Check its <code style="font-family:'DM Mono',monospace;font-size:11px">src</code>, <code style="font-family:'DM Mono',monospace;font-size:11px">data-src</code>, and any <code style="font-family:'DM Mono',monospace;font-size:11px">data-*</code> attributes. This tells you which attributes hold the real image URL.</p>
+          </div>
+          <div class="dt-card">
+            <div class="dt-icon">🌐</div>
+            <h4>Network tab → Img filter</h4>
+            <p>Filter by "Img" type. Scroll the page to trigger lazy loads. You'll see the exact CDN domain and URL pattern all product images share.</p>
+          </div>
+          <div class="dt-card">
+            <div class="dt-icon">⌨</div>
+            <h4>Console test</h4>
+            <p>Try <code style="font-family:'DM Mono',monospace;font-size:11px">document.querySelectorAll('img').length</code> to count images, and <code style="font-family:'DM Mono',monospace;font-size:11px">document.querySelectorAll('img')[0].src</code> to inspect the first one.</p>
+          </div>
+          <div class="dt-card">
+            <div class="dt-icon">📄</div>
+            <h4>View Source → Ctrl+F</h4>
+            <p>Search for the CDN domain name you found in Network tab. This tells you if image URLs are embedded in the HTML (easy to regex) or loaded dynamically.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="guide-step">
+      <div class="gs-num">3</div>
+      <div class="gs-body">
+        <h3>Copy the template block into vendors.js</h3>
+        <p>The template is included at the bottom of the VENDORS object in <code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">vendors.js</code> as a comment. Copy it, uncomment it, and fill in your vendor's details.</p>
+
+        <div class="code-block" style="margin-top:16px">
+          <div class="code-block-header">📄 vendors.js — new vendor template</div>
+          <div class="code-block-body">
+<span class="str">"your-vendor-domain.com"</span>: {<br>
+&nbsp;&nbsp;<span class="kw">name</span>: <span class="str">"Your Vendor Name"</span>,<br>
+&nbsp;&nbsp;<span class="kw">icon</span>: <span class="str">"🛋"</span>,       <span class="cm">// any emoji</span><br>
+&nbsp;&nbsp;<span class="kw">color</span>: <span class="str">"#f59e0b"</span>,  <span class="cm">// accent color in the popup UI</span><br>
+&nbsp;&nbsp;<span class="kw">scraper</span>: <span class="fn">function</span>() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span> seen = <span class="kw">new</span> <span class="fn">Set</span>();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span> results = [];<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">function</span> <span class="fn">add</span>(url) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (!url || seen.has(url)) <span class="kw">return</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// skip icons/logos</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (/icon|logo|placeholder/i.test(url)) <span class="kw">return</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// must be an image file</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (!url.match(/\.(jpg|jpeg|png|webp)(\?.*)?$/i)) <span class="kw">return</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;seen.add(url); results.push(url);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// ——— Write your detection logic here ———</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// Standard: all img tags</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;document.<span class="fn">querySelectorAll</span>(<span class="str">"img"</span>).<span class="fn">forEach</span>(img => <span class="fn">add</span>(img.src));<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// CDN pattern (replace with real domain):</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// const cdn = /https:\/\/cdn\.yourvendor\.com\/[^\s"']+\.(jpg|png)/gi;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// (document.body.innerHTML.match(cdn)||[]).forEach(u => add(u));</span><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> results;<br>
+&nbsp;&nbsp;}<br>
+},
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="guide-step">
+      <div class="gs-num">4</div>
+      <div class="gs-body">
+        <h3>Write the scraper function</h3>
+        <p>The scraper runs <strong>inside the vendor's page</strong> (injected via <code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">chrome.scripting</code>), so you have full access to <code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">document</code> and <code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">window</code>. It must return an array of absolute image URL strings.</p>
+
+        <p>Use the pattern library below to pick the right detection method for what you found in DevTools:</p>
+
+        <div class="code-block">
+          <div class="code-block-header">🧩 Common detection patterns</div>
+          <div class="code-block-body">
+<span class="cm">// 1. Standard img tags (most sites)</span><br>
+document.<span class="fn">querySelectorAll</span>(<span class="str">"img"</span>).<span class="fn">forEach</span>(img => {<br>
+&nbsp;&nbsp;<span class="fn">add</span>(img.src);<br>
+&nbsp;&nbsp;<span class="fn">add</span>(img.dataset.src);         <span class="cm">// lazy-load</span><br>
+&nbsp;&nbsp;<span class="fn">add</span>(img.dataset.lazySrc);<br>
+});<br><br>
+<span class="cm">// 2. Zoom / gallery data attrs</span><br>
+document.<span class="fn">querySelectorAll</span>(<span class="str">"[data-zoom-image],[data-large]"</span>)<br>
+&nbsp;&nbsp;.<span class="fn">forEach</span>(el => <span class="fn">add</span>(el.getAttribute(<span class="str">"data-zoom-image"</span>)));<br><br>
+<span class="cm">// 3. CDN domain regex (fastest for most vendor portals)</span><br>
+<span class="kw">const</span> pattern = /https:\/\/cdn\.site\.com\/[^\s"'&lt;&gt;]+\.(jpg|png)/gi;<br>
+(document.body.innerHTML.<span class="fn">match</span>(pattern) || []).<span class="fn">forEach</span>(u => <span class="fn">add</span>(u));<br><br>
+<span class="cm">// 4. CSS background-image on elements</span><br>
+document.<span class="fn">querySelectorAll</span>(<span class="str">"[style*='background']"</span>).<span class="fn">forEach</span>(el => {<br>
+&nbsp;&nbsp;<span class="kw">const</span> m = (el.getAttribute(<span class="str">"style"</span>)||<span class="str">""</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.<span class="fn">match</span>(/url\(['"]?([^'")\s]+)['"]?\)/i);<br>
+&nbsp;&nbsp;<span class="kw">if</span> (m) <span class="fn">add</span>(m[<span class="num">1</span>]);<br>
+});<br><br>
+<span class="cm">// 5. Plain text URLs in a named section</span><br>
+<span class="kw">const</span> section = <span class="fn">findByText</span>(<span class="str">"DOWNLOADS"</span>);<br>
+<span class="kw">if</span> (section) section.innerText.<span class="fn">split</span>(<span class="str">"\n"</span>).<span class="fn">forEach</span>(line => {<br>
+&nbsp;&nbsp;<span class="kw">if</span> (/^https?:\/\/.+\.(jpg|png)/i.<span class="fn">test</span>(line.<span class="fn">trim</span>())) <span class="fn">add</span>(line.<span class="fn">trim</span>());<br>
+});
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>Important:</strong> The scraper function is serialized as a string and injected into the page. This means it <strong>cannot reference variables or functions from outside itself</strong> — everything it needs must be defined inside the function body. The <code style="font-family:'DM Mono',monospace;font-size:12px">add()</code> helper must be defined inside <code style="font-family:'DM Mono',monospace;font-size:12px">scraper()</code>.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="guide-step">
+      <div class="gs-num">5</div>
+      <div class="gs-body">
+        <h3>Test in Chrome</h3>
+        <p>Reload the extension (<code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">chrome://extensions</code> → click the reload icon), navigate to the vendor's product page, and click Scan. Check the count — if it seems low, open DevTools console on that page and run parts of your scraper manually to debug.</p>
+
+        <div class="warn-box">
+          <strong>⚠ If you get 0 results:</strong> The most common cause is that images are loaded dynamically by JavaScript after page load. Try scrolling the page first to trigger lazy loading, then scan again. If images only appear after user interaction (e.g. clicking a gallery), the scraper may need to wait — or you need to interact with the page first.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="guide-step">
+      <div class="gs-num">6</div>
+      <div class="gs-body">
+        <h3>Reload the extension — done</h3>
+        <p>No rebuild, no compile step, no changes to any other file. The extension reads <code style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2)">vendors.js</code> at runtime, so your new vendor appears in the popup and the settings vendor list automatically.</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- PATTERN REFERENCE TABLE -->
+    <div class="s-label">Quick reference</div>
+    <h2 class="s-title" style="margin-bottom:10px;">Detection Pattern Library</h2>
+    <p class="s-desc" style="margin-bottom:0">Match your DevTools finding to the right code pattern.</p>
+
+    <table class="pattern-table">
+      <thead>
+        <tr>
+          <th>Pattern</th>
+          <th>When to use</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>img[src]</td>
+          <td>Images are standard &lt;img&gt; tags, not lazy-loaded</td>
+          <td>Most basic product pages</td>
+        </tr>
+        <tr>
+          <td>img[data-src]</td>
+          <td>Images use lazy loading — src is empty or a placeholder on load</td>
+          <td>Sites using LazyLoad.js, Intersection Observer</td>
+        </tr>
+        <tr>
+          <td>data-zoom-image</td>
+          <td>Product page has a zoom/lightbox gallery</td>
+          <td>Magento, WooCommerce product pages</td>
+        </tr>
+        <tr>
+          <td>CDN regex</td>
+          <td>Images all come from a single CDN domain you found in Network tab</td>
+          <td>portal.vendor.com, cdn.vendor.com, images.vendor.com</td>
+        </tr>
+        <tr>
+          <td>background-image</td>
+          <td>Product "images" are CSS backgrounds on div elements, not img tags</td>
+          <td>Custom-built catalog pages, slide backgrounds</td>
+        </tr>
+        <tr>
+          <td>plain text URLs</td>
+          <td>A "Downloads" or "Assets" section lists raw URLs as page text</td>
+          <td>Wholesale portals, dealer sites</td>
+        </tr>
+        <tr>
+          <td>a[href] images</td>
+          <td>Images are linked directly with anchor tags</td>
+          <td>Simple catalog pages, press asset pages</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:48px;display:flex;gap:12px">
+      <a href="install.html" class="btn btn-primary">Install the Extension →</a>
+      <a href="vendors.html" class="btn btn-outline">View All Vendors</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="nav.js"></script>
+</body>
+</html>

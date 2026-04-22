@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How It Works — Vendor Image Grabber</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* ——— STEP TIMELINE ——— */
+    .timeline {
+      position: relative;
+      padding: 0 0 0 48px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+
+    .step {
+      position: relative;
+      margin-bottom: 52px;
+    }
+
+    .step-dot {
+      position: absolute;
+      left: -40px; top: 4px;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 16px rgba(124,106,247,0.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .step-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--accent); font-family: 'DM Mono', monospace;
+      margin-bottom: 8px;
+    }
+
+    .step h3 {
+      font-size: 22px; font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      font-size: 15px; color: var(--muted); line-height: 1.75;
+      max-width: 600px;
+    }
+
+    .step .step-card {
+      margin-top: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      max-width: 620px;
+    }
+
+    .step .step-card h4 {
+      font-size: 12px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 12px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .method-list {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .method-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 12px;
+      background: rgba(124,106,247,0.06);
+      border: 1px solid rgba(124,106,247,0.12);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .method-item .m-icon { font-size: 15px; }
+    .method-item .m-name { font-weight: 700; flex: 1; }
+    .method-item .m-desc { font-size: 12px; color: var(--muted); }
+
+    /* ——— ARCHITECTURE ——— */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-top: 40px;
+    }
+
+    .arch-cell {
+      background: var(--bg);
+      padding: 28px 24px;
+    }
+
+    .arch-cell h4 {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; font-weight: 700;
+      color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .arch-cell .a-file {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px; color: var(--text);
+      font-weight: 600; margin-bottom: 10px;
+    }
+
+    .arch-cell p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  </style>
+</head>
+<body>
+<script>window.ACTIVE_PAGE="how-it-works.html";</script>
+
+<div class="page">
+  <div class="page-hero">
+    <p class="page-tag">// process</p>
+    <h1 class="page-title">HOW IT<br><em>Works</em></h1>
+    <p class="page-desc">From opening the extension to files landing in your Downloads folder — here's exactly what happens at each step.</p>
+  </div>
+
+  <div class="content">
+
+    <!-- STEP-BY-STEP FLOW -->
+    <div class="s-label" style="margin-bottom:40px;">Step-by-step flow</div>
+
+    <div class="timeline">
+
+      <div class="step">
+        <div class="step-dot">1</div>
+        <p class="step-label">Step 01</p>
+        <h3>Navigate to a vendor page</h3>
+        <p>Go to any supported vendor's product catalog, category page, or individual product page in Chrome. The extension constantly monitors the active tab's URL and auto-detects when you're on a supported site.</p>
+        <div class="step-card">
+          <h4>Supported sites</h4>
+          <div class="method-list">
+            <div class="method-item">
+              <span class="m-icon">🪞</span>
+              <span class="m-name">Bassett Mirror</span>
+              <span class="m-desc">bassettmirror.com</span>
+            </div>
+            <div class="method-item">
+              <span class="m-icon">🏠</span>
+              <span class="m-name">Worldwide Home</span>
+              <span class="m-desc">worldwidehomefurnishingsinc.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot">2</div>
+        <p class="step-label">Step 02</p>
+        <h3>Click the extension icon & hit Scan</h3>
+        <p>The extension popup opens, showing the detected vendor. Click <strong>Scan for Images</strong> — this injects a scraper script directly into the live page using Chrome's <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent-2)">chrome.scripting</code> API.</p>
+        <div class="step-card">
+          <h4>4 detection methods run in parallel</h4>
+          <div class="method-list">
+            <div class="method-item">
+              <span class="m-icon">🏷</span>
+              <span class="m-name">img[src] + lazy attrs</span>
+              <span class="m-desc">src, data-src, data-lazy-src, data-original</span>
+            </div>
+            <div class="method-item">
+              <span class="m-icon">🔢</span>
+              <span class="m-name">Data attributes</span>
+              <span class="m-desc">data-zoom-image, data-large, data-full, data-img</span>
+            </div>
+            <div class="method-item">
+              <span class="m-icon">🎨</span>
+              <span class="m-name">CSS background-image</span>
+              <span class="m-desc">Parses inline style attributes for url() values</span>
+            </div>
+            <div class="method-item">
+              <span class="m-icon">🔗</span>
+              <span class="m-name">CDN regex scan</span>
+              <span class="m-desc">Scans raw HTML for image CDN URLs by pattern</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-dot">3</div>
+        <p class="step-label">Step 03</p>
+        <h3>Review the thumbnail grid</h3>
+        <p>All found images load as thumbnails in the extension popup. By default, all images are pre-selected. You can click individual thumbnails to toggle them, or use <strong>Select All</strong> to toggle everything. Use the format filter (All / JPG / PNG / WEBP) to narrow the selection.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-dot">4</div>
+        <p class="step-label">Step 04</p>
+        <h3>Download to your machine</h3>
+        <p>Click <strong>Download Selected</strong>. The extension uses the native <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent-2)">chrome.downloads</code> API to save each file. Images are throttled with a 280ms delay between downloads to avoid browser queue limits and saved to a named subfolder:</p>
+        <div class="step-card" style="margin-top:16px;">
+          <h4>Download path</h4>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent-2);line-height:2;">
+            ~/Downloads/<br>
+            &nbsp;&nbsp;vendor-images/<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;bassettmirror-com/<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BA-6398LNS-A.jpg<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BA-6398LNS-B.jpg<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BA-6398LNS-C.jpg<br>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="divider">
+
+    <!-- ARCHITECTURE -->
+    <div class="s-label">Extension architecture</div>
+    <h2 class="s-title" style="margin-bottom:10px;">File Structure</h2>
+    <p class="s-desc">The extension is 4 files. Vendor logic is fully separated from the UI engine.</p>
+
+    <div class="arch-grid">
+      <div class="arch-cell">
+        <h4>Config</h4>
+        <div class="a-file">manifest.json</div>
+        <p>Declares the extension's permissions, entry points, and supported host patterns.</p>
+      </div>
+      <div class="arch-cell">
+        <h4>Vendors</h4>
+        <div class="a-file">vendors.js</div>
+        <p>The vendor registry. All scrapers and site configs live here. Add a new vendor here — nothing else needs to change.</p>
+      </div>
+      <div class="arch-cell">
+        <h4>UI Engine</h4>
+        <div class="a-file">popup.js + popup.html</div>
+        <p>Renders the extension popup, handles user interaction, triggers scraping, and manages downloads. Reads from vendors.js.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:40px">
+      <a href="features.html" class="btn btn-primary">Explore Features →</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="nav.js"></script>
+</body>
+</html>

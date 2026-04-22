@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Image Grabber</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #1e1e2e;
+      --accent: #7c6af7;
+      --accent-glow: rgba(124,106,247,0.25);
+      --green: #4ade80;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --vendor-color: var(--accent);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 380px;
+      min-height: 520px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -40%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 65%);
+      pointer-events: none;
+      transition: background 0.5s;
+    }
+
+    /* ——— HEADER ——— */
+    .header {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--vendor-color, var(--accent)), color-mix(in srgb, var(--vendor-color, var(--accent)) 60%, white));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 0 18px var(--accent-glow);
+      flex-shrink: 0;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+
+    .header-text h1 {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .header-text p {
+      font-size: 9px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-top: 1px;
+    }
+
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+    /* Settings icon */
+    .settings-btn {
+      width: 28px; height: 28px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .settings-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .status-dot.active { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 2s infinite; }
+    .status-dot.error { background: var(--red); }
+    .status-dot.warn { background: var(--yellow); }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ——— VENDOR BADGE ——— */
+    .vendor-badge {
+      margin: 12px 18px 0;
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.3s;
+    }
+
+    .vendor-badge.detected { border-color: rgba(124,106,247,0.3); }
+
+    .v-icon { font-size: 16px; }
+    .v-name { font-size: 12px; font-weight: 700; }
+    .v-domain {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-left: auto;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ——— SCAN BUTTON ——— */
+    .scan-wrap { padding: 12px 18px 0; }
+
+    .btn-scan {
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, white));
+      border: none; border-radius: 10px;
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .btn-scan:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-scan:active { transform: translateY(0); }
+    .btn-scan:disabled { opacity: 0.45; cursor: not-allowed; transform: none; filter: none; }
+    .btn-scan.scanning { background: var(--surface); color: var(--muted); box-shadow: none; border: 1px solid var(--border); }
+
+    /* ——— PROGRESS ——— */
+    .progress-bar {
+      margin: 10px 18px 0;
+      height: 2px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .progress-bar.visible { opacity: 1; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #a78bfa);
+      border-radius: 99px;
+      width: 0;
+      transition: width 0.3s ease;
+    }
+    .progress-fill.indeterminate {
+      width: 35%;
+      animation: slide 1.1s ease-in-out infinite;
+    }
+    @keyframes slide { 0%{transform:translateX(-120%)} 100%{transform:translateX(420%)} }
+
+    /* ——— STATS ——— */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      padding: 11px 18px 0;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 8px 7px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 20px; font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-size: 8px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-top: 3px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ——— FILTER BAR ——— */
+    .filter-bar {
+      padding: 10px 18px 0;
+      display: flex;
+      gap: 6px;
+    }
+
+    .filter-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      background: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(124,106,247,0.08); }
+    .filter-btn:hover { color: var(--text); }
+
+    /* ——— IMAGE GRID ——— */
+    .images-section { padding: 10px 18px 0; }
+
+    .images-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 7px;
+    }
+
+    .images-title {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .select-all-btn {
+      font-size: 10px; color: var(--accent);
+      background: none; border: none;
+      cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700;
+      padding: 0; transition: opacity 0.2s;
+    }
+    .select-all-btn:hover { opacity: 0.7; }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      max-height: 176px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .image-thumb {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+      background: var(--surface);
+    }
+
+    .image-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-thumb.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .thumb-check {
+      position: absolute; top: 3px; right: 3px;
+      width: 14px; height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: none;
+      align-items: center; justify-content: center;
+      font-size: 8px;
+    }
+    .image-thumb.selected .thumb-check { display: flex; }
+
+    .thumb-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; opacity: 0.3;
+    }
+
+    /* ——— DOWNLOAD BAR ——— */
+    .download-section {
+      padding: 10px 18px 14px;
+      display: flex;
+      gap: 7px;
+    }
+
+    .btn-download {
+      flex: 1; padding: 10px;
+      background: var(--green);
+      border: none; border-radius: 8px;
+      color: #07100e;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px; font-weight: 800;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
+      letter-spacing: 0.03em;
+    }
+    .btn-download:hover { filter: brightness(1.1); }
+    .btn-download:disabled { opacity: 0.3; cursor: not-allowed; filter: none; }
+
+    .btn-clear {
+      padding: 10px 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-clear:hover { color: var(--red); border-color: var(--red); }
+
+    /* ——— LOG ——— */
+    .log-panel {
+      margin: 0 18px 14px;
+      padding: 8px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      max-height: 72px;
+      overflow-y: auto;
+      display: none;
+      scrollbar-width: thin;
+    }
+    .log-panel.visible { display: block; }
+    .log-line { line-height: 1.75; }
+    .log-line.ok { color: var(--green); }
+    .log-line.err { color: var(--red); }
+    .log-line.info { color: var(--accent); }
+
+    /* ——— UNSUPPORTED / EMPTY STATES ——— */
+    .state-box {
+      padding: 30px 20px;
+      text-align: center;
+    }
+    .state-box .s-icon { font-size: 38px; margin-bottom: 12px; opacity: 0.6; }
+    .state-box h3 { font-size: 14px; font-weight: 800; margin-bottom: 7px; }
+    .state-box p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    .vendor-chips {
+      margin-top: 14px;
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+    }
+    .vendor-chip {
+      font-size: 10px;
+      font-family: 'DM Mono', monospace;
+      color: var(--accent);
+      background: rgba(124,106,247,0.1);
+      border: 1px solid rgba(124,106,247,0.2);
+      padding: 3px 10px;
+      border-radius: 5px;
+    }
+
+    /* ——— SETTINGS PANEL ——— */
+    .settings-panel {
+      position: absolute; inset: 0;
+      background: var(--bg);
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+    }
+    .settings-panel.open { display: flex; }
+
+    .settings-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .btn-back {
+      background: none; border: none;
+      color: var(--muted); font-size: 18px;
+      cursor: pointer; padding: 0;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .btn-back:hover { color: var(--text); }
+
+    .settings-title { font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .settings-body { padding: 16px 18px; flex: 1; overflow-y: auto; }
+
+    .setting-group { margin-bottom: 22px; }
+    .setting-label {
+      font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+
+    .setting-row-text h4 { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+    .setting-row-text p { font-size: 10px; color: var(--muted); }
+
+    .toggle {
+      width: 36px; height: 20px;
+      background: var(--border);
+      border-radius: 99px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+      border: none;
+    }
+    .toggle.on { background: var(--accent); }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 14px; height: 14px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle.on::after { transform: translateX(16px); }
+
+    .vendor-list-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+    .vli-icon { font-size: 18px; }
+    .vli-name { font-size: 12px; font-weight: 700; }
+    .vli-domain { font-size: 9px; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .vli-status {
+      margin-left: auto;
+      padding: 2px 8px;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--green);
+      font-family: 'DM Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MAIN UI -->
+  <div id="app">
+    <div class="header">
+      <div class="logo" id="logo">🖼</div>
+      <div class="header-text">
+        <h1>Image Grabber</h1>
+        <p id="headerSub">Vendor Product Scraper</p>
+      </div>
+      <div class="header-right">
+        <button class="settings-btn" id="settingsBtn" title="Settings">⚙</button>
+        <div class="status-dot" id="statusDot"></div>
+      </div>
+    </div>
+
+    <div id="mainContent"></div>
+  </div>
+
+  <!-- SETTINGS PANEL -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings-header">
+      <button class="btn-back" id="backBtn">←</button>
+      <span class="settings-title">Settings</span>
+    </div>
+    <div class="settings-body">
+      <div class="setting-group">
+        <div class="setting-label">Download Options</div>
+        <div class="setting-row">
+          <div class="setting-row-text">
+            <h4>Auto-select all images</h4>
+            <p>Select all found images by default</p>
+          </div>
+          <button class="toggle on" id="toggleAutoSelect"></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row-text">
+            <h4>Throttle downloads</h4>
+            <p>Add delay between downloads (300ms)</p>
+          </div>
+          <button class="toggle on" id="toggleThrottle"></button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-row-text">
+            <h4>Skip duplicate filenames</h4>
+            <p>Rename file if same name exists</p>
+          </div>
+          <button class="toggle on" id="toggleDedup"></button>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">Active Vendors</div>
+        <div id="vendorListSettings"></div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-label">Download Folder</div>
+        <div class="setting-row">
+          <div class="setting-row-text">
+            <h4>Save to subfolder</h4>
+            <p id="folderPathDisplay">vendor-images/</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="vendors.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
