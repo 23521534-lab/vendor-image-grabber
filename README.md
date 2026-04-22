@@ -8,19 +8,20 @@ A Chrome Extension that automatically detects and batch-downloads product images
 
 ## Features
 
-- 🔍 **Auto-detects** product images using 4 parallel scraping methods
-- 🖼 **Live preview grid** with thumbnail checkboxes before downloading
-- ⬇ **Batch download** to a named `vendor-images/` folder
-- 🏷 **Preserves original filenames** from the server
-- 📋 **Real-time activity log** with success/error per image
-- 🔌 **Vendor-specific scrapers** tuned for each site's HTML structure
+- **Auto-detects** product images using 4 parallel scraping methods
+- **Live preview grid** with thumbnail checkboxes before downloading
+- **Batch download** to a named `vendor-images/` folder
+- **Preserves original filenames** from the server
+- **Real-time activity log** with success/error per image
+- **Vendor-specific scrapers** tuned for each site's HTML structure
 
 ## Supported Vendors
 
-| Vendor | URL | Detection Methods |
-|--------|-----|-------------------|
-| Bassett Mirror | bassettmirror.com | img[src], data-zoom-image, background-image, a[href] |
-| Worldwide Home | worldwidehomefurnishingsinc.com | Portal CDN regex, DOWNLOADS section, img[src], href links |
+| Vendor | URL | Platform | Detection Methods |
+|--------|-----|----------|-------------------|
+| Bassett Mirror | bassettmirror.com | Custom | img[src], data-zoom-image, background-image, CDN regex, a[href] |
+| Worldwide Home | worldwidehomefurnishingsinc.com | Custom | Portal CDN regex, DOWNLOADS section, img[src], href links |
+| LeisureMod | leisuremod.com | Shopify | cdn.shopify.com regex, data-src/data-zoom-src, Swiper slides, embedded product JSON, srcset |
 
 ## Tech Stack
 
