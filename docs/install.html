@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install — Vendor Image Grabber</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .install-steps {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .is {
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      align-items: center;
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .is:first-child { border-radius: 14px 14px 2px 2px; }
+    .is:last-child  { border-radius: 2px 2px 14px 14px; }
+    .is:hover { border-color: rgba(124,106,247,0.3); }
+
+    .is-num {
+      height: 100%;
+      background: rgba(124,106,247,0.07);
+      border-right: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: var(--accent);
+      padding: 22px 0;
+    }
+
+    .is-body { padding: 20px 24px; }
+    .is-body h4 { font-size: 15px; font-weight: 800; margin-bottom: 5px; }
+    .is-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .is-body code {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      background: rgba(124,106,247,0.1);
+      color: var(--accent-2);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* File structure */
+    .file-tree {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 2.1;
+      margin-top: 32px;
+    }
+
+    .ft-dir { color: var(--accent-2); font-weight: 600; }
+    .ft-file { color: var(--text); padding-left: 20px; }
+    .ft-comment { color: var(--muted); font-size: 11px; }
+    .ft-important { color: var(--green); }
+
+    /* Permissions list */
+    .perms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .perm-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .perm-card .p-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px; color: var(--accent-2);
+      font-weight: 600; margin-bottom: 6px;
+    }
+
+    .perm-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  </style>
+</head>
+<body>
+<script>window.ACTIVE_PAGE="install.html";</script>
+
+<div class="page">
+  <div class="page-hero">
+    <p class="page-tag">// get started</p>
+    <h1 class="page-title">INSTALL</h1>
+    <p class="page-desc">The extension loads as an unpacked extension in Chrome. No Chrome Web Store required — takes about 2 minutes.</p>
+    <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;">
+      <a href="https://github.com/23521534-lab/vendor-image-grabber/archive/refs/heads/main.zip"
+         class="btn btn-primary" style="font-size:15px;padding:14px 32px;">
+        ⬇ Download ZIP from GitHub
+      </a>
+      <a href="https://github.com/23521534-lab/vendor-image-grabber"
+         target="_blank" class="btn btn-outline" style="font-size:15px;padding:14px 32px;">
+        View on GitHub ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="content content-narrow">
+
+    <div class="install-steps">
+
+      <div class="is">
+        <div class="is-num">1</div>
+        <div class="is-body">
+          <h4>Download the extension files</h4>
+          <p>Click <strong>Download ZIP from GitHub</strong> above, or go to
+            <a href="https://github.com/23521534-lab/vendor-image-grabber" target="_blank"
+               style="color:var(--accent)">github.com/23521534-lab/vendor-image-grabber</a>
+            → click the green <strong>Code</strong> button → <strong>Download ZIP</strong>.
+            Once downloaded, unzip the file on your computer.
+          </p>
+        </div>
+      </div>
+
+      <div class="is">
+        <div class="is-num">2</div>
+        <div class="is-body">
+          <h4>Open Chrome Extensions</h4>
+          <p>In Chrome, navigate to <code>chrome://extensions</code> in the address bar and press Enter.</p>
+        </div>
+      </div>
+
+      <div class="is">
+        <div class="is-num">3</div>
+        <div class="is-body">
+          <h4>Turn on Developer Mode</h4>
+          <p>In the top-right corner of the Extensions page, toggle <strong>Developer mode</strong> on. This unlocks the ability to load local extensions.</p>
+        </div>
+      </div>
+
+      <div class="is">
+        <div class="is-num">4</div>
+        <div class="is-body">
+          <h4>Load the unpacked extension</h4>
+          <p>Click <strong>Load unpacked</strong> (top-left). In the file dialog, navigate to and select the unzipped <code>vendor-image-grabber-main/</code> folder. Click Select/Open.</p>
+        </div>
+      </div>
+
+      <div class="is">
+        <div class="is-num">5</div>
+        <div class="is-body">
+          <h4>Pin the extension to your toolbar</h4>
+          <p>Click the puzzle piece 🧩 icon in Chrome's toolbar → find <strong>Vendor Image Grabber</strong> → click the pin icon. The extension icon now appears permanently in your toolbar.</p>
+        </div>
+      </div>
+
+      <div class="is">
+        <div class="is-num">6</div>
+        <div class="is-body">
+          <h4>Navigate to a vendor page and scan</h4>
+          <p>Go to <code>bassettmirror.com</code>, <code>worldwidehomefurnishingsinc.com</code>, or <code>leisuremod.com</code> — browse to a product page, click the extension icon, and hit <strong>Scan for Images</strong>.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="divider">
+
+    <!-- FILE STRUCTURE -->
+    <div class="s-label">Extension folder</div>
+    <h2 class="s-title" style="margin-bottom:10px;">What You're Loading</h2>
+    <p class="s-desc">Chrome loads the entire folder as the extension. Here's what each file does.</p>
+
+    <div class="file-tree">
+      <div class="ft-dir">vendor-image-grabber/</div>
+      <div class="ft-file ft-important">vendors.js &nbsp;&nbsp;&nbsp;<span class="ft-comment">← Add new vendors here</span></div>
+      <div class="ft-file">manifest.json &nbsp;&nbsp;<span class="ft-comment">← Extension config & permissions</span></div>
+      <div class="ft-file">popup.html &nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← Extension popup UI</span></div>
+      <div class="ft-file">popup.js &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← UI engine & download logic</span></div>
+      <div class="ft-file">background.js &nbsp;&nbsp;<span class="ft-comment">← Service worker (download events)</span></div>
+      <div class="ft-file">icons/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ft-comment">← Extension icons (16, 48, 128px)</span></div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- PERMISSIONS -->
+    <div class="s-label">Permissions</div>
+    <h2 class="s-title" style="margin-bottom:10px;">What It Accesses</h2>
+    <p class="s-desc">The extension requests only the permissions it needs.</p>
+
+    <div class="perms-grid">
+      <div class="perm-card">
+        <div class="p-name">activeTab</div>
+        <p>Read the URL of the current tab to detect which vendor you're on. No access to other tabs.</p>
+      </div>
+      <div class="perm-card">
+        <div class="p-name">scripting</div>
+        <p>Inject the scraper function into the active page. Required to run JavaScript that scans the page's DOM for image URLs.</p>
+      </div>
+      <div class="perm-card">
+        <div class="p-name">downloads</div>
+        <p>Save files to your Downloads folder using Chrome's native download manager. Images go into a named subfolder.</p>
+      </div>
+      <div class="perm-card">
+        <div class="p-name">storage</div>
+        <p>Persist settings (auto-select, throttle, dedup) across browser sessions using Chrome's local storage API.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:48px;display:flex;gap:12px;flex-wrap:wrap">
+      <a href="add-vendor.html" class="btn btn-primary">Add a New Vendor →</a>
+      <a href="how-it-works.html" class="btn btn-outline">How It Works</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="nav.js"></script>
+</body>
+</html>
