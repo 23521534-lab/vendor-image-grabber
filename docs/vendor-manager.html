@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vendor Manager — ImageGrab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="nav.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d14;
+      --bg2: #13131f;
+      --bg3: #1a1a2e;
+      --bg4: #0f0f1a;
+      --border: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.15);
+      --text: #e8e8f0;
+      --text-dim: #8888a8;
+      --text-muted: #55557a;
+      --accent: #7c6af7;
+      --accent-dim: rgba(124,106,247,0.15);
+      --accent-border: rgba(124,106,247,0.3);
+      --green: #4ade80;
+      --green-dim: rgba(74,222,128,0.1);
+      --red: #f87171;
+      --red-dim: rgba(248,113,113,0.1);
+      --yellow: #fbbf24;
+      --font: 'Space Grotesk', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --radius: 12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .page-wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 100px 60px 80px;
+    }
+
+    .page-header {
+      margin-bottom: 48px;
+    }
+    .page-header h1 {
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+    .page-header p {
+      color: var(--text-dim);
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 560px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ── Panel ── */
+    .panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .panel-body { padding: 24px; }
+
+    /* ── Form fields ── */
+    .field-group { margin-bottom: 20px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 7px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    input[type="text"], input[type="url"], textarea, select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      padding: 10px 13px;
+      transition: border-color 0.2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type="text"]:focus, input[type="url"]:focus,
+    textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    textarea {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      resize: vertical;
+      min-height: 240px;
+    }
+    select { cursor: pointer; }
+    select option { background: var(--bg3); }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .hint code {
+      font-family: var(--mono);
+      background: rgba(255,255,255,0.06);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+    }
+
+    /* ── Buttons ── */
+    .btn { display: inline-flex; align-items: center; gap: 7px; border: none; cursor: pointer; font-family: var(--font); font-weight: 600; border-radius: 9px; transition: all 0.18s; }
+    .btn-primary { background: var(--accent); color: #fff; font-size: 0.9rem; padding: 11px 20px; }
+    .btn-primary:hover { background: #6a58e5; transform: translateY(-1px); }
+    .btn-secondary { background: var(--bg3); color: var(--text); font-size: 0.85rem; padding: 9px 16px; border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--border-hover); }
+    .btn-danger { background: var(--red-dim); color: var(--red); font-size: 0.78rem; padding: 6px 12px; border: 1px solid rgba(248,113,113,0.2); border-radius: 7px; }
+    .btn-danger:hover { background: rgba(248,113,113,0.18); }
+    .btn-ghost { background: transparent; color: var(--text-dim); font-size: 0.8rem; padding: 7px 12px; border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
+    .btn-green { background: var(--green-dim); color: var(--green); font-size: 0.85rem; padding: 9px 16px; border: 1px solid rgba(74,222,128,0.2); }
+    .btn-green:hover { background: rgba(74,222,128,0.18); }
+
+    .form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+
+    /* ── Vendor list (right panel) ── */
+    .vendor-list { display: flex; flex-direction: column; gap: 0; }
+    .vendor-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background 0.15s;
+    }
+    .vendor-item:last-child { border-bottom: none; }
+    .vendor-item:hover { background: rgba(255,255,255,0.02); }
+    .vi-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .vi-icon { font-size: 1.4rem; width: 36px; text-align: center; flex-shrink: 0; }
+    .vi-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vi-url { font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vi-badge {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 100px;
+      flex-shrink: 0;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .vi-active { color: var(--green); background: var(--green-dim); border: 1px solid rgba(74,222,128,0.25); }
+    .vi-inactive { color: var(--yellow); background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); }
+    .vi-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .vi-edit {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .vi-edit:hover { color: var(--text); border-color: var(--border-hover); background: rgba(255,255,255,0.08); }
+
+    .empty-state {
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ── Output section ── */
+    .output-section {
+      margin-top: 32px;
+    }
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .output-label { font-size: 0.8rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+    .output-code {
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.8;
+      color: #c8c8e8;
+      overflow-x: auto;
+      white-space: pre;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text-dim);
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--border-hover); }
+    .copy-btn.copied { color: var(--green); border-color: rgba(74,222,128,0.3); }
+
+    /* ── Template accordion ── */
+    .templates {
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .tpl-header {
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background: var(--bg3);
+      user-select: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .tpl-header:hover { background: rgba(255,255,255,0.05); }
+    .tpl-arrow { transition: transform 0.2s; }
+    .tpl-body { display: none; }
+    .tpl-body.open { display: block; }
+    .tpl-item {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .tpl-item:hover { background: rgba(124,106,247,0.06); }
+    .tpl-name { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+    .tpl-desc { font-size: 0.76rem; color: var(--text-dim); }
+    .tpl-item.active { background: var(--accent-dim); border-left: 2px solid var(--accent); }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 0.85rem;
+      display: flex; align-items: center; gap: 9px;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+      z-index: 999;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 24px; }
+    .tab-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: none;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .tab-btn.active {
+      color: var(--text);
+      background: var(--bg3);
+      border-color: var(--border);
+    }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* ── Divider ── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    @media (max-width: 1000px) {
+      .two-col { grid-template-columns: 1fr; }
+      .page-wrap { padding-left: 24px; padding-right: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <h1>Vendor Manager</h1>
+    <p>Add new vendors and paste their scraper code here. The page generates your updated <code style="font-family:var(--mono);font-size:0.85em;color:var(--accent);background:rgba(124,106,247,0.12);padding:2px 7px;border-radius:5px">vendors.js</code> — copy it into your extension and reload.</p>
+  </div>
+
+  <div class="two-col">
+
+    <!-- LEFT: form -->
+    <div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('add')">Add Vendor</button>
+        <button class="tab-btn" onclick="switchTab('generate')">Generate vendors.js</button>
+      </div>
+
+      <!-- Tab: Add Vendor -->
+      <div class="tab-pane active" id="tab-add">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title" id="form-mode-label">New Vendor</span>
+            <button class="btn btn-ghost" onclick="resetForm()" id="cancel-edit-btn" style="display:none">Cancel edit</button>
+          </div>
+          <div class="panel-body">
+
+            <div class="field-row">
+              <div>
+                <label>Vendor Name</label>
+                <input type="text" id="f-name" placeholder="e.g. Ashley Furniture" />
+              </div>
+              <div>
+                <label>Icon Emoji</label>
+                <input type="text" id="f-icon" placeholder="🛋️" maxlength="4" style="font-size:1.3rem;text-align:center" />
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Domain / URL key</label>
+              <input type="text" id="f-domain" placeholder="ashleyfurniture.com" />
+              <p class="hint">This is the key used to match the active browser tab. Just the domain, no <code>https://</code>.</p>
+            </div>
+
+            <div class="field-row">
+              <div>
+                <label>Accent Color</label>
+                <input type="text" id="f-color" placeholder="#f59e0b" />
+                <p class="hint">Hex color shown in the extension popup.</p>
+              </div>
+              <div>
+                <label>Status</label>
+                <select id="f-status">
+                  <option value="active">Active</option>
+                  <option value="inactive">Work in progress</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Description</label>
+              <input type="text" id="f-desc" placeholder="Short description of how this vendor serves images..." />
+            </div>
+
+            <div class="field-group">
+              <label>Scraper Function Body</label>
+              <textarea id="f-scraper" placeholder="// Paste your scraper code here.
+// It should collect image URLs and return an array.
+// The VENDORS key and function wrapper are added automatically.
+
+const seen = new Set();
+const results = [];
+
+function add(url) {
+  if (!url || seen.has(url)) return;
+  if (/icon|logo|sprite|placeholder/i.test(url)) return;
+  if (!url.match(/\.(jpg|jpeg|png|webp)(\?.*)?$/i)) return;
+  seen.add(url);
+  results.push(url);
+}
+
+// Example: grab all img src
+document.querySelectorAll('img').forEach(img => {
+  add(img.src);
+  add(img.dataset.src);
+  add(img.dataset.zoomImage);
+});
+
+return results;"></textarea>
+              <p class="hint">Paste the function body only — no <code>function() {</code> wrapper needed, that's added automatically.</p>
+            </div>
+
+            <div class="field-group">
+              <label>Detection Methods (for vendor card)</label>
+              <input type="text" id="f-methods" placeholder="img[src], data-zoom-image, CDN regex" />
+              <p class="hint">Comma-separated list of detection techniques shown as tags on the Vendors page.</p>
+            </div>
+
+            <div class="field-group">
+              <label>Best Pages to Scan</label>
+              <input type="text" id="f-tip" placeholder="Individual product pages — zoom images give highest resolution." />
+            </div>
+
+            <!-- Scraper templates -->
+            <div class="templates">
+              <div class="tpl-header" onclick="toggleTemplates(this)">
+                <span>📋 Scraper Templates</span>
+                <span class="tpl-arrow">▼</span>
+              </div>
+              <div class="tpl-body" id="tpl-body">
+                <div class="tpl-item" onclick="applyTemplate('shopify')">
+                  <div class="tpl-name">Shopify Store</div>
+                  <div class="tpl-desc">Uses /products/[handle].js API + variant alt-text matching. Works for most Shopify furniture stores.</div>
+                </div>
+                <div class="tpl-item" onclick="applyTemplate('generic')">
+                  <div class="tpl-name">Generic (img tags + CDN scan)</div>
+                  <div class="tpl-desc">Scans all img[src], data-src, data-zoom-image, and background-image CSS. Good starting point for unknown sites.</div>
+                </div>
+                <div class="tpl-item" onclick="applyTemplate('cdnregex')">
+                  <div class="tpl-name">CDN Regex Pattern</div>
+                  <div class="tpl-desc">Grabs all URLs matching a CDN subdomain pattern from the page HTML. Useful for sites with portal/media subdomains.</div>
+                </div>
+                <div class="tpl-item" onclick="applyTemplate('downloads')">
+                  <div class="tpl-name">Downloads Section Parser</div>
+                  <div class="tpl-desc">Finds a DOWNLOADS or Assets section and extracts direct image links. For wholesale/B2B sites.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="saveVendor()">
+                <span id="save-btn-label">Save Vendor</span>
+              </button>
+              <button class="btn btn-secondary" onclick="resetForm()">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Generate -->
+      <div class="tab-pane" id="tab-generate">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Generated vendors.js</span>
+          </div>
+          <div class="panel-body">
+            <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:16px">
+              This is the full <code style="font-family:var(--mono);font-size:0.8em">vendors.js</code> file with all your vendors included.
+              Copy it and replace your extension's file, then reload the extension at <code style="font-family:var(--mono);font-size:0.8em">chrome://extensions</code>.
+            </p>
+            <div class="output-header">
+              <span class="output-label">vendors.js</span>
+              <button class="copy-btn" onclick="copyOutput()">📋 Copy all</button>
+            </div>
+            <div class="output-code" id="output-code">// No vendors added yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: vendor list -->
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Vendors (<span id="vendor-count">3</span>)</span>
+          <button class="btn btn-ghost" style="font-size:0.75rem;padding:5px 11px" onclick="regenerate()">↻ Refresh output</button>
+        </div>
+        <div class="vendor-list" id="vendor-list">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Quick Reference</span></div>
+          <div class="panel-body" style="font-size:0.8rem;color:var(--text-dim);line-height:1.7">
+            <p><strong style="color:var(--text)">scraper()</strong> must return an array of image URL strings.</p>
+            <hr class="section-divider" />
+            <p><strong style="color:var(--text)">Common selectors:</strong></p>
+            <p><code style="font-family:var(--mono);font-size:0.73em">img[src]</code> — basic images</p>
+            <p><code style="font-family:var(--mono);font-size:0.73em">img[data-src]</code> — lazy-loaded</p>
+            <p><code style="font-family:var(--mono);font-size:0.73em">img[data-zoom-image]</code> — zoom galleries</p>
+            <p><code style="font-family:var(--mono);font-size:0.73em">a[href$=".jpg"]</code> — direct image links</p>
+            <hr class="section-divider" />
+            <p><strong style="color:var(--text)">Filter pattern:</strong></p>
+            <p style="font-family:var(--mono);font-size:0.72em;color:#a8a8c8">/icon|logo|sprite|thumb/i.test(url)</p>
+            <hr class="section-divider" />
+            <p><strong style="color:var(--text)">Shopify product API:</strong></p>
+            <p style="font-family:var(--mono);font-size:0.72em;color:#a8a8c8">/products/[handle].js</p>
+            <p>Returns full media list with variant associations.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast">✓ <span id="toast-msg"></span></div>
+
+<script>
+// ── State ── 
+const DEFAULT_VENDORS = [
+  {
+    id: 'bassettmirror',
+    name: 'Bassett Mirror',
+    icon: '🪞',
+    domain: 'bassettmirror.com',
+    color: '#7c6af7',
+    status: 'active',
+    desc: 'Furniture and mirror catalog. Product images are served through multiple mechanisms — standard img tags, zoom gallery data attributes, and CSS background images on swatch elements.',
+    methods: ['img[src]', 'data-zoom-image', 'data-large / data-full', 'background-image CSS', 'a[href] image links', 'CDN HTML scan'],
+    tip: 'Individual product pages and category listing pages. Zoom images give the highest resolution.',
+    scraper: `const seen = new Set();
+const results = [];
+
+function add(url) {
+  if (!url || seen.has(url)) return;
+  if (/icon|logo|sprite|placeholder|1x1|pixel/i.test(url)) return;
+  if (!url.match(/\\.(jpg|jpeg|png|webp)(\\?.*)?$/i)) return;
+  seen.add(url);
+  results.push(url);
+}
+
+// 1. Standard img tags
+document.querySelectorAll('img').forEach(img => {
+  add(img.src);
+  add(img.getAttribute('data-zoom-image'));
+  add(img.getAttribute('data-large'));
+  add(img.getAttribute('data-full'));
+});
+
+// 2. CSS background images
+document.querySelectorAll('[style]').forEach(el => {
+  const m = el.style.backgroundImage.match(/url\\(["']?([^"')]+)["']?\\)/);
+  if (m) add(m[1]);
+});
+
+// 3. a[href] direct image links
+document.querySelectorAll('a[href]').forEach(a => {
+  if (/\\.(jpg|jpeg|png|webp)/i.test(a.href)) add(a.href);
+});
+
+// 4. CDN scan from page HTML
+const html = document.documentElement.innerHTML;
+const cdnMatches = html.match(/https?:\\/\\/[^"'\\s]+\\.(?:jpg|jpeg|png|webp)/gi) || [];
+cdnMatches.forEach(add);
+
+return results;`
+  },
+  {
+    id: 'worldwide',
+    name: 'Worldwide Home',
+    icon: '🏠',
+    domain: 'worldwidehomefurnishingsinc.com',
+    color: '#4ecdc4',
+    status: 'active',
+    desc: 'Wholesale home furnishings vendor. Images are served from a separate portal CDN subdomain. Product pages also contain a DOWNLOADS section with direct full-resolution image URLs listed as plain text.',
+    methods: ['portal CDN regex', 'DOWNLOADS section parser', 'img[src]', 'a[href] image links'],
+    tip: 'Individual product pages — the DOWNLOADS section contains the highest-resolution images.',
+    scraper: `const seen = new Set();
+const results = [];
+
+function add(url) {
+  if (!url || seen.has(url)) return;
+  if (/icon|logo|sprite|placeholder/i.test(url)) return;
+  if (!url.match(/\\.(jpg|jpeg|png|webp)(\\?.*)?$/i)) return;
+  seen.add(url);
+  results.push(url);
+}
+
+// 1. Portal CDN pattern
+const html = document.documentElement.innerHTML;
+const cdnMatches = html.match(/https?:\\/\\/portal\\.[^"'\\s]+\\.(?:jpg|jpeg|png|webp)/gi) || [];
+cdnMatches.forEach(add);
+
+// 2. DOWNLOADS section — plain text URLs
+const allText = document.body.innerText;
+const downloadMatches = allText.match(/https?:\\/\\/[^\\s]+\\.(?:jpg|jpeg|png|webp)/gi) || [];
+downloadMatches.forEach(add);
+
+// 3. Standard img tags
+document.querySelectorAll('img').forEach(img => add(img.src));
+
+// 4. a[href] image links
+document.querySelectorAll('a[href]').forEach(a => {
+  if (/\\.(jpg|jpeg|png|webp)/i.test(a.href)) add(a.href);
+});
+
+return results;`
+  },
+  {
+    id: 'leisuremod',
+    name: 'LeisureMod',
+    icon: '🛋️',
+    domain: 'leisuremod.com',
+    color: '#f7a26a',
+    status: 'active',
+    desc: 'Shopify-based furniture and decor store. Images are served from the Shopify CDN. Uses the /products/[handle].js API to get variant-level media, matching images to the selected color variant.',
+    methods: ['Shopify /products.js API', 'variant featured_media', 'alt-text color match', 'cdn.shopify.com CDN', 'data-src lazy images'],
+    tip: 'Individual product pages. Select your color variant first, then run — it downloads only that variant\'s images.',
+    scraper: `(async () => {
+  const handle = window.location.pathname.split('/products/')[1]?.split('?')[0];
+  if (!handle) { console.error('Not on a product page'); return []; }
+
+  const product = await fetch('/products/' + handle + '.js').then(r => r.json());
+
+  const variantId = parseInt(
+    document.querySelector('pickup-availability[data-variant-id]')?.dataset.variantId
+  );
+
+  const variant = product.variants.find(v => v.id === variantId);
+  if (!variant) { console.error('Could not detect selected variant'); return []; }
+
+  const variantColor = variant.public_title.toLowerCase();
+  const variantMediaId = variant.featured_media?.id;
+
+  const variantMedia = product.media.filter(m => {
+    const alt = (m.alt || '').toLowerCase();
+    return alt.includes(variantColor) || m.id === variantMediaId;
+  });
+
+  return [...new Set(variantMedia.map(m => m.src.split('?')[0]))];
+})()`
+  }
+];
+
+let vendors = JSON.parse(localStorage.getItem('ig-vendors') || 'null') || DEFAULT_VENDORS;
+let editingId = null;
+
+function saveToStorage() {
+  localStorage.setItem('ig-vendors', JSON.stringify(vendors));
+}
+
+// ── Render vendor list ──
+function renderList() {
+  const list = document.getElementById('vendor-list');
+  document.getElementById('vendor-count').textContent = vendors.length;
+
+  if (!vendors.length) {
+    list.innerHTML = '<div class="empty-state">No vendors yet. Add one →</div>';
+    return;
+  }
+
+  list.innerHTML = vendors.map((v, i) => `
+    <div class="vendor-item">
+      <div class="vi-left">
+        <div class="vi-icon">${v.icon}</div>
+        <div>
+          <div class="vi-name">${v.name}</div>
+          <div class="vi-url">${v.domain}</div>
+        </div>
+      </div>
+      <span class="vi-badge ${v.status === 'active' ? 'vi-active' : 'vi-inactive'}">${v.status === 'active' ? 'Active' : 'WIP'}</span>
+      <div class="vi-actions">
+        <button class="vi-edit" onclick="editVendor(${i})">Edit</button>
+        <button class="btn-danger" onclick="deleteVendor(${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Generate vendors.js ──
+function generateOutput() {
+  if (!vendors.length) return '// No vendors added yet.';
+
+  const blocks = vendors.map(v => {
+    return `  "${v.domain}": {
+    name: "${v.name}",
+    icon: "${v.icon}",
+    color: "${v.color}",
+    status: "${v.status}",
+    desc: ${JSON.stringify(v.desc)},
+    methods: ${JSON.stringify(v.methods)},
+    tip: ${JSON.stringify(v.tip)},
+    scraper: function () {
+${v.scraper.split('\n').map(l => '      ' + l).join('\n')}
+    }
+  }`;
+  }).join(',\n\n');
+
+  return `// vendors.js — ImageGrab Vendor Registry
+// Generated by Vendor Manager — ${new Date().toLocaleDateString()}
+// Add new vendors via: docs/vendor-manager.html
+
+const VENDORS = {
+${blocks}
+};
+
+if (typeof module !== 'undefined') module.exports = VENDORS;`;
+}
+
+function regenerate() {
+  document.getElementById('output-code').textContent = generateOutput();
+  toast('Output regenerated');
+}
+
+// ── Save vendor ──
+function saveVendor() {
+  const name    = document.getElementById('f-name').value.trim();
+  const domain  = document.getElementById('f-domain').value.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const icon    = document.getElementById('f-icon').value.trim() || '🏪';
+  const color   = document.getElementById('f-color').value.trim() || '#7c6af7';
+  const status  = document.getElementById('f-status').value;
+  const desc    = document.getElementById('f-desc').value.trim();
+  const scraper = document.getElementById('f-scraper').value.trim();
+  const methods = document.getElementById('f-methods').value.split(',').map(s => s.trim()).filter(Boolean);
+  const tip     = document.getElementById('f-tip').value.trim();
+
+  if (!name || !domain || !scraper) {
+    toast('Please fill in Name, Domain, and Scraper code', true);
+    return;
+  }
+
+  const entry = { id: domain.replace(/\W/g, '_'), name, icon, domain, color, status, desc, methods, tip, scraper };
+
+  if (editingId !== null) {
+    vendors[editingId] = entry;
+    toast('Vendor updated!');
+  } else {
+    vendors.push(entry);
+    toast('Vendor saved!');
+  }
+
+  saveToStorage();
+  renderList();
+  regenerate();
+  resetForm();
+  switchTab('generate');
+}
+
+// ── Edit / delete ──
+function editVendor(i) {
+  const v = vendors[i];
+  editingId = i;
+  document.getElementById('f-name').value    = v.name;
+  document.getElementById('f-icon').value    = v.icon;
+  document.getElementById('f-domain').value  = v.domain;
+  document.getElementById('f-color').value   = v.color;
+  document.getElementById('f-status').value  = v.status;
+  document.getElementById('f-desc').value    = v.desc;
+  document.getElementById('f-scraper').value = v.scraper;
+  document.getElementById('f-methods').value = v.methods.join(', ');
+  document.getElementById('f-tip').value     = v.tip;
+  document.getElementById('form-mode-label').textContent = 'Editing: ' + v.name;
+  document.getElementById('cancel-edit-btn').style.display = 'inline-flex';
+  document.getElementById('save-btn-label').textContent = 'Update Vendor';
+  switchTab('add');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteVendor(i) {
+  if (!confirm('Remove "' + vendors[i].name + '"?')) return;
+  vendors.splice(i, 1);
+  saveToStorage();
+  renderList();
+  regenerate();
+  toast('Vendor removed');
+}
+
+function resetForm() {
+  editingId = null;
+  ['f-name','f-icon','f-domain','f-color','f-desc','f-scraper','f-methods','f-tip'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-status').value = 'active';
+  document.getElementById('form-mode-label').textContent = 'New Vendor';
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+  document.getElementById('save-btn-label').textContent = 'Save Vendor';
+}
+
+// ── Tabs ──
+function switchTab(id) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['add','generate'][i] === id);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (id === 'generate') regenerate();
+}
+
+// ── Templates ──
+const TEMPLATES = {
+  shopify: {
+    methods: 'Shopify /products.js API, variant featured_media, alt-text color match, cdn.shopify.com CDN',
+    tip: 'Individual product pages. Select your color variant first, then run the scraper.',
+    scraper: `(async () => {
+  const handle = window.location.pathname.split('/products/')[1]?.split('?')[0];
+  if (!handle) { console.error('Not on a product page'); return []; }
+  const product = await fetch('/products/' + handle + '.js').then(r => r.json());
+  const variantId = parseInt(
+    document.querySelector('pickup-availability[data-variant-id]')?.dataset.variantId
+  );
+  const variant = product.variants.find(v => v.id === variantId);
+  if (!variant) { console.error('Could not detect variant'); return []; }
+  const variantColor = variant.public_title.toLowerCase();
+  const variantMediaId = variant.featured_media?.id;
+  const variantMedia = product.media.filter(m => {
+    const alt = (m.alt || '').toLowerCase();
+    return alt.includes(variantColor) || m.id === variantMediaId;
+  });
+  return [...new Set(variantMedia.map(m => m.src.split('?')[0]))];
+})()`
+  },
+  generic: {
+    methods: 'img[src], data-src, data-zoom-image, background-image CSS, a[href] links',
+    tip: 'Product and category pages. Zoom images give the highest resolution.',
+    scraper: `const seen = new Set();
+const results = [];
+
+function add(url) {
+  if (!url || seen.has(url)) return;
+  if (/icon|logo|sprite|placeholder|1x1/i.test(url)) return;
+  if (!url.match(/\\.(jpg|jpeg|png|webp)(\\?.*)?$/i)) return;
+  seen.add(url);
+  results.push(url);
+}
+
+document.querySelectorAll('img').forEach(img => {
+  add(img.src);
+  add(img.dataset.src);
+  add(img.dataset.zoomImage);
+  add(img.dataset.large);
+});
+
+document.querySelectorAll('[style]').forEach(el => {
+  const m = el.style.backgroundImage.match(/url\\(["']?([^"')]+)["']?\\)/);
+  if (m) add(m[1]);
+});
+
+document.querySelectorAll('a[href]').forEach(a => {
+  if (/\\.(jpg|jpeg|png|webp)/i.test(a.href)) add(a.href);
+});
+
+return results;`
+  },
+  cdnregex: {
+    methods: 'CDN regex pattern, page HTML scan',
+    tip: 'Any page. The regex catches all image URLs matching the CDN subdomain.',
+    scraper: `const seen = new Set();
+const results = [];
+
+// Replace 'media.yoursite.com' with the actual CDN subdomain
+const CDN_PATTERN = /https?:\\/\\/media\\.[^"'\\s]+\\.(?:jpg|jpeg|png|webp)/gi;
+
+const html = document.documentElement.innerHTML;
+const matches = html.match(CDN_PATTERN) || [];
+
+matches.forEach(url => {
+  if (seen.has(url)) return;
+  if (/icon|logo|sprite/i.test(url)) return;
+  seen.add(url);
+  results.push(url);
+});
+
+return results;`
+  },
+  downloads: {
+    methods: 'DOWNLOADS section parser, plain text URL extraction',
+    tip: 'Individual product pages — the DOWNLOADS section has the highest-resolution assets.',
+    scraper: `const seen = new Set();
+const results = [];
+
+function add(url) {
+  if (!url || seen.has(url)) return;
+  if (/icon|logo/i.test(url)) return;
+  if (!url.match(/\\.(jpg|jpeg|png|webp)(\\?.*)?$/i)) return;
+  seen.add(url);
+  results.push(url);
+}
+
+// 1. Find DOWNLOADS or Assets section and scan for URLs
+const allText = document.body.innerText;
+const textURLs = allText.match(/https?:\\/\\/[^\\s]+\\.(?:jpg|jpeg|png|webp)/gi) || [];
+textURLs.forEach(add);
+
+// 2. Fallback: all img tags
+document.querySelectorAll('img').forEach(img => add(img.src));
+
+return results;`
+  }
+};
+
+function toggleTemplates(header) {
+  const body = document.getElementById('tpl-body');
+  const arrow = header.querySelector('.tpl-arrow');
+  const isOpen = body.classList.toggle('open');
+  arrow.textContent = isOpen ? '▲' : '▼';
+}
+
+function applyTemplate(key) {
+  const t = TEMPLATES[key];
+  if (!t) return;
+  document.getElementById('f-scraper').value = t.scraper;
+  document.getElementById('f-methods').value = t.methods;
+  document.getElementById('f-tip').value = t.tip;
+  document.querySelectorAll('.tpl-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  toast('Template applied — fill in the rest ↑');
+}
+
+// ── Copy output ──
+function copyOutput() {
+  const code = document.getElementById('output-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector('[onclick="copyOutput()"]');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy all'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── Toast ──
+let toastTimer;
+function toast(msg, error = false) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  el.style.borderColor = error ? 'rgba(248,113,113,0.3)' : 'rgba(74,222,128,0.2)';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Init ──
+renderList();
+regenerate();
+</script>
+
+</body>
+</html>
