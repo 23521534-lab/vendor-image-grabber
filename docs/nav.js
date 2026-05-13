@@ -50,7 +50,6 @@
   `;
   document.body.insertAdjacentHTML("afterbegin", navHTML);
   document.body.insertAdjacentHTML("beforeend", footerHTML);
-  // Expose GitHub URLs globally so any page can use them
   window.GITHUB_URL = GITHUB_URL;
   window.GITHUB_ZIP = GITHUB_ZIP;
 })();
